@@ -2,12 +2,12 @@
 
 variable "region" {
   type = string
-  default = "europe-west1"
+  default = "europe-west4"
 }
 
 variable "zone" {
   type = string
-  default = "europe-west1-c"
+  default = "europe-west4-a"
 }
 
 variable "machine_type" {
@@ -42,6 +42,16 @@ variable "install_script" {
   default = "nothing.sh"
 }
 
+variable "gpu_count" {
+  type = number
+  default = 0
+}
+
+variable "gpu_type" {
+  type = string
+  default = "dummy"
+}
+
 
 provider "google" {
   project     = "transformers-409614"
@@ -67,6 +77,17 @@ resource "google_compute_instance" "transformers" {
       image = var.image
       size = var.disk_size
     }
+  }
+
+  scheduling {
+    on_host_maintenance = "TERMINATE"
+  }
+
+
+
+  guest_accelerator {
+     type = var.gpu_type
+     count = var.gpu_count
   }
   
   provisioner "local-exec" {
